@@ -32,7 +32,19 @@ public class WheelDrive : MonoBehaviour
 
     private WheelCollider[] m_Wheels;
 
-    // Find all the WheelColliders down in the hierarchy.
+	// Find all the WheelColliders down in the hierarchy.
+
+	//Input actions
+
+	PlayerInputActions inputActions;
+
+	Vector2 movementInput;
+
+	private void Awake()
+	{
+		inputActions = new PlayerInputActions();
+		inputActions.PlayerControls.Move.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
+	}
 	void Start()
 	{
 		m_Wheels = GetComponentsInChildren<WheelCollider>();
@@ -62,8 +74,8 @@ public class WheelDrive : MonoBehaviour
 	{
 		m_Wheels[0].ConfigureVehicleSubsteps(criticalSpeed, stepsBelow, stepsAbove);
 
-		float angle = maxAngle * Input.GetAxis("Horizontal");
-		float torque = maxTorque * Input.GetAxis("Vertical");
+		float angle = maxAngle * movementInput.x;
+		float torque = maxTorque * movementInput.y;
 
 		float handBrake = Input.GetKey(KeyCode.X) ? brakeTorque : 0;
 
@@ -101,5 +113,15 @@ public class WheelDrive : MonoBehaviour
 				shapeTransform.rotation = q;
 			}
 		}
+	}
+
+	private void OnEnable()
+	{
+		inputActions.Enable();
+	}
+
+	private void OnDisable()
+	{
+		inputActions.Disable();
 	}
 }
